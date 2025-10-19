@@ -52,5 +52,18 @@ def list_pending_leaves():
         ).fetchall()
     return rows
 
+#  List all leaves for a specific employee
+def list_employee_leaves(employee_id):
+    with get_connection() as conn:
+        rows = conn.execute(
+            """
+            SELECT leave_id, leave_type, start_date, end_date, days, reason, status, manager_remark
+            FROM leaves
+            WHERE employee_id = ?
+            ORDER BY created_at DESC
+            """,
+            (employee_id,),
+        ).fetchall()
+    return rows
 
 
