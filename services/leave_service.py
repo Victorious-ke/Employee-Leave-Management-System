@@ -38,4 +38,19 @@ def apply_leave(employee_id, leave_type, start_date, end_date, days, reason):
     print(f" Leave request submitted for employee ID {employee_id} ({days} day(s), {leave_type}).")
 
 
+#  List all pending leave requests
+def list_pending_leaves():
+    with get_connection() as conn:
+        rows = conn.execute(
+            """
+            SELECT l.leave_id, e.name, l.leave_type, l.start_date, l.end_date, l.days, l.reason, l.status
+            FROM leaves l
+            JOIN employees e ON e.employee_id = l.employee_id
+            WHERE l.status = 'Pending'
+            ORDER BY l.created_at DESC
+            """
+        ).fetchall()
+    return rows
+
+
 
