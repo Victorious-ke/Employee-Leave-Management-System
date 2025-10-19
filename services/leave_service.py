@@ -70,6 +70,39 @@ def delete_employee(employee_id):
         conn.commit()
     print(f" Employee ID {employee_id} deleted successfully.")
 
+#  Adjust leave balance (used after approvals)
+def adjust_leave_balance(employee_id, leave_type, days):
+    field_map = {
+        "Annual": "annual_leave_balance",
+        "Sick": "sick_leave_balance",
+        "Casual": "casual_leave_balance",
+    }
+    if leave_type not in field_map:
+        raise ValueError("Invalid leave type. Must be Annual, Sick, or Casual.")
+
+    with get_connection() as conn:
+        conn.execute(
+            f"""
+            UPDATE employees
+            SET {field_map[leave_type]} = {field_map[leave_type]} - ?
+            WHERE employee_id = ?
+            """,
+            (days, employee_id),
+        )
+        conn.commit()
+    print(f"Updated {leave_type} leave balance for employee ID {employee_id}.")
+
+#  Get employee leave balances
+def get_leave_balances(employee_id):
+    with get_connection() as conn:
+        row = conn.execute(
+            """
+            SELECT annual_leave_balance, sick_leave_balance, casual_leave_balance
+            FROM employees WHERE employee_id = ?
+            """,
+            (employee_id,),
+        ).fetchone()
+    return row
 
 
 
