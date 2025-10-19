@@ -66,4 +66,78 @@ def list_employee_leaves(employee_id):
         ).fetchall()
     return rows
 
+#  Approve a leave request
+def approve_leave(leave_id, remark=None):
+    with get_connection() as conn:
+        leave = conn.execute(
+            "SELECT * FROM leaves WHERE leave_id = ?", (leave_id,)
+        ).fetchone()
+
+        if not leave:
+            print(" Leave request not found.")
+            return
+        if leave["status"] != "Pending":
+            print(f" Leave ID {leave_id} is already {leave['status']}.")
+            return
+
+        # Update status to Approved
+        conn.execute(
+            """
+            UPDATE leaves
+            SET status = 'Approved', manager_remark = ?, updated_at = datetime('now')
+            WHERE leave_id = ?
+            """,
+            (remark or "Approved", leave_id),
+        )
+        conn.commit()
+
+        # Adjust employee leave balance
+        adjust_leave_balance(leave["employee_id"], leave["leave_type"], leave["days"])
+    print(f" Leave ID {leave_id} approved successfully.")
+
+#  Reject a leave request
+def reject_leave(leave_id, remark=None):
+    with get_connection() as conn:
+        leave = conn.execute(
+            "SELECT * FROM leaves WHERE leave_id = ?", (leave_id,)
+        ).fetchone()
+
+        if not leave:
+            print(" Leave request not found.")
+            return
+        if leave["status"] != "Pending":
+            print(f" Leave ID {leave_id} is already {leave['status']}.")
+            return
+
+        conn.execute(
+            """
+            UPDATE leaves
+            SET status = 'Rejected', manager_remark = ?, updated_at = datetime('now')
+            WHERE leave_id = ?
+            """,
+            (remark or "Rejected", leave_id),
+        )
+        conn.commit()
+    print(f"Leave ID {leave_id} rejected successfully.")
+
+
+#  Summary report for department or all employees
+def leave_summary():
+    with get_connection() as conn:
+        rows = conn.execute(
+            """
+            SELECT e.department,
+                   COUNT(l.leave_id) AS total_leaves,
+                   SUM(CASE WHEN l.status = 'Approved' THEN 1 ELSE 0 END) AS approved,
+                   SUM(CASE WHEN l.status = 'Rejected' THEN 1 ELSE 0 END) AS rejected,
+                   SUM(CASE WHEN l.status = 'Pending' THEN 1 ELSE 0 END) AS pending
+            FROM employees e
+            LEFT JOIN leaves l ON e.employee_id = l.employee_id
+            GROUP BY e.department
+            """
+        ).fetchall()
+    return rows
+
+
+
 
