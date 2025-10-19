@@ -63,6 +63,13 @@ def update_employee(employee_id, name=None, department=None, position=None):
         conn.commit()
     print(f" Employee ID {employee_id} updated successfully.")
 
+# Remove an employee
+def delete_employee(employee_id):
+    with get_connection() as conn:
+        conn.execute("DELETE FROM employees WHERE employee_id = ?", (employee_id,))
+        conn.commit()
+    print(f" Employee ID {employee_id} deleted successfully.")
+
 
 
 
