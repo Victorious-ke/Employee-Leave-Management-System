@@ -39,5 +39,30 @@ def get_employee(employee_id):
         ).fetchone()
     return row
 
+#  Update an employee’s details
+def update_employee(employee_id, name=None, department=None, position=None):
+    with get_connection() as conn:
+        current = get_employee(employee_id)
+        if not current:
+            print("Employee not found.")
+            return
+
+        # Default to existing values if not provided
+        name = name or current["name"]
+        department = department or current["department"]
+        position = position or current["position"]
+
+        conn.execute(
+            """
+            UPDATE employees
+            SET name = ?, department = ?, position = ?
+            WHERE employee_id = ?
+            """,
+            (name, department, position, employee_id),
+        )
+        conn.commit()
+    print(f" Employee ID {employee_id} updated successfully.")
+
+
 
 
