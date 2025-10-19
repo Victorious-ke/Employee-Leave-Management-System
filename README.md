@@ -23,8 +23,8 @@ Optional: Flask for web UI, smtplib or transactional email provider for notifica
 
 1. Clone the repo
 
-git clone <your-repo-url>
-cd employee-leave-management
+git clone <https://github.com/Victorious-ke/Employee-Leave-Management-System>
+cd Employee-Leave-Management
 
 
 2. Create & activate Python virtual environment
@@ -38,7 +38,6 @@ source .venv/bin/activate    # macOS / Linux
 
 pip install -r requirements.txt
 
-
 If you are using only SQLite + stdlib, requirements.txt can be empty or minimal. Add SQLAlchemy, Flask, etc. only if you plan to use them.
 
 4. Create the database
@@ -46,17 +45,11 @@ You can use the provided SQL schema (see below) and run it with the SQLite CLI:
 
 sqlite3 employee_leave.db < schema.sql
 
-
 5. Run the CLI app
 
 python cli_app.py
 
-
-(or follow the repo's run instructions)
-
 ## Database Schema
-
-
 
 1. Open database
 
@@ -132,14 +125,12 @@ employee-leave-management/
 ├── README.md
 ├── schema.sql
 ├── requirements.txt
-├── cli_app.py            # CLI entrypoint
-├── db.py                 # DB connection helpers (sqlite / sqlalchemy)
-├── models.py             # ORM models (optional)
-├── services/             # business-logic (apply, approve, reports)
+├── cli_app.py            
+├── db.py                 
+├── models.py             
+├── services/             
 │   ├── leave_service.py
 │   └── employee_service.py
-├── tests/
-│   └── test_leave_flow.py
 └── docs/
     └── design.md
 
